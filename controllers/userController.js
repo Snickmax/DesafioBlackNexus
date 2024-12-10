@@ -33,10 +33,40 @@ export const getUserById = async (req, res) => {
 
 export const updateUser = async (req, res) => {
   try {
-    const { nombre, rol } = req.body;
-    const [updated] = await User.update({ nombre, rol }, { where: { id: req.params.id } });
-    if (updated) res.status(200).json({ message: 'User updated' });
-    else res.status(404).json({ error: 'User not found' });
+    const { nombre, rol, password, email, oldPassword } = req.body;
+
+    const userId = req.params.id;
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Verificar que la contraseña actual (oldPassword) es correcta antes de realizar cualquier actualización
+    if (oldPassword) {
+      const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
+      if (!isOldPasswordValid) {
+        return res.status(400).json({ error: 'Current password is incorrect' });
+      }
+    }
+
+    let updatedPassword = user.password; // Mantener la contraseña actual por defecto
+    // Si se proporciona una nueva contraseña, hashearla antes de actualizar
+    if (password) {
+      updatedPassword = await bcrypt.hash(password, 10); // Hashear la nueva contraseña
+    }
+
+    // Actualizar los datos del usuario
+    const [updated] = await User.update(
+      { nombre, rol, password: updatedPassword, email },
+      { where: { id: userId } }
+    );
+
+    if (updated) {
+      res.status(200).json({ message: 'User updated' });
+    } else {
+      res.status(404).json({ error: 'User not found' });
+    }
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
