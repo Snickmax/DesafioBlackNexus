@@ -25,7 +25,7 @@ export const getUserById = async (req, res) => {
   try {
     const user = await User.findByPk(req.params.id);
     if (user) res.status(200).json(user);
-    else res.status(404).json({ error: 'User not found' });
+    else res.status(404).json({ error: 'Usuario no encontrado' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -39,14 +39,14 @@ export const updateUser = async (req, res) => {
     const user = await User.findByPk(userId);
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: 'Usuario no encontrado' });
     }
 
     // Verificar que la contraseña actual (oldPassword) es correcta antes de realizar cualquier actualización
     if (oldPassword) {
       const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
       if (!isOldPasswordValid) {
-        return res.status(400).json({ error: 'Current password is incorrect' });
+        return res.status(400).json({ error: 'Contraseña incorrecta' });
       }
     }
 
@@ -63,9 +63,9 @@ export const updateUser = async (req, res) => {
     );
 
     if (updated) {
-      res.status(200).json({ message: 'User updated' });
+      res.status(200).json({ message: 'Usuario actualizado' });
     } else {
-      res.status(404).json({ error: 'User not found' });
+      res.status(404).json({ error: 'Usuario no encontrado' });
     }
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -75,8 +75,8 @@ export const updateUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
   try {
     const deleted = await User.destroy({ where: { id: req.params.id } });
-    if (deleted) res.status(200).json({ message: 'User deleted' });
-    else res.status(404).json({ error: 'User not found' });
+    if (deleted) res.status(200).json({ message: 'Usuario eliminado' });
+    else res.status(404).json({ error: 'Usuario no encontrado' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
