@@ -35,6 +35,11 @@ const User = sequelize.define('User', {
     type: DataTypes.ENUM('Admin', 'Usuario'),
     allowNull: false,
   },
+  
+},
+{
+  tableName: 'usuarios', // Especifica el nombre exacto de la tabla
+  timestamps: true,      // Habilita createdAt y updatedAt
 });
 
 export default User;
